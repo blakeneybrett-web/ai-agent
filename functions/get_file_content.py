@@ -3,8 +3,7 @@ import os
 from config import CHARACTER_LIMIT
 
 def get_file_content(working_directory, file_path):
-    try:
-            
+    try:        
         # If filepath is outside working directory return an error
         working_dir_abs = os.path.abspath(working_directory)
         target_dir = os.path.normpath(os.path.join(working_dir_abs,file_path))
