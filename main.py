@@ -2,9 +2,12 @@
 
 import os
 import argparse
+from call_function import available_functions
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from prompts import system_prompt
+
 
 load_dotenv()
 
@@ -25,7 +28,13 @@ def main():
     if api_key == None:
         raise RuntimeError("cannot find api key, please check .env file")
 
-    response = client.models.generate_content(model = "gemini-2.5-flash",contents = messages)
+    response = client.models.generate_content(
+        model= "gemini-2.5-flash",
+        contents=messages,
+        config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt),
+        #config=types.GenerateContentConfig(system_instruction=system_prompt,temperature=0),
+    )
+
     if response.usage_metadata == None:
         raise RuntimeError("response has no metadata")
 
@@ -34,11 +43,19 @@ def main():
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
         print("Response:")
-        print(response.text)
+        if response.function_calls is None:
+            print(response.text)
+        else:
+            for call in response.function_calls:
+                print(f"Calling function: {call.name}({call.args})")
 
     if args.verbose == False:
-        print("Response:")
-        print(response.text)
+        if response.function_calls is None:
+            print(response.text)
+        else:
+            for call in response.function_calls:
+                print(f"Calling function: {call.name}({call.args})")
+
 
 if __name__ == "__main__":
     main()
