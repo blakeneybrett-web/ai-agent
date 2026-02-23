@@ -2,7 +2,7 @@
 
 import os
 import argparse
-from call_function import available_functions
+from call_function import available_functions, call_function
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -28,6 +28,8 @@ def main():
     if api_key == None:
         raise RuntimeError("cannot find api key, please check .env file")
 
+    list_of_function_results = []
+
     response = client.models.generate_content(
         model= "gemini-2.5-flash",
         contents=messages,
@@ -47,14 +49,31 @@ def main():
             print(response.text)
         else:
             for call in response.function_calls:
-                print(f"Calling function: {call.name}({call.args})")
+                #print(f"Calling function: {call.name}({call.args})")
+                function_call_result = call_function(call, args.verbose)
+                if function_call_result.parts == None:
+                    raise Exception("function_call_result.parts is None:")
+                if function_call_result.parts[0].function_response == None:
+                    raise Exception("function_call_result.parts[0].function_response is None")
+                if function_call_result.parts[0].function_response.response == None:
+                    raise Exception("function_call_result.parts[0].function_response.response is None")
+                list_of_function_results.append(function_call_result.parts[0])
+                print(f"-> {function_call_result.parts[0].function_response.response}")
 
     if args.verbose == False:
         if response.function_calls is None:
             print(response.text)
         else:
             for call in response.function_calls:
-                print(f"Calling function: {call.name}({call.args})")
+                #print(f"Calling function: {call.name}({call.args})")
+                function_call_result = call_function(call, args.verbose)
+                if function_call_result.parts == None:
+                    raise Exception("function_call_result.parts is None:")
+                if function_call_result.parts[0].function_response == None:
+                    raise Exception("function_call_result.parts[0].function_response is None")
+                if function_call_result.parts[0].function_response.response == None:
+                    raise Exception("function_call_result.parts[0].function_response.response is None")
+                list_of_function_results.append(function_call_result.parts[0])
 
 
 if __name__ == "__main__":
