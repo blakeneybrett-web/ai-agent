@@ -1,5 +1,6 @@
 # functions/write_file.py
 import os
+from google.genai import types
 
 def write_file(working_directory, file_path, content):
     try:
@@ -25,3 +26,27 @@ def write_file(working_directory, file_path, content):
 
     except Exception as e:
         print(f"Error: Encountered: {e}")
+
+
+# google-genai FunctionDeclaration format
+schema_write_file = types.FunctionDeclaration(
+    name="write_file",
+    description="Write or overwrite files",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+            ),
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file to be written to",
+            ),
+            "content": types.Schema(
+                type=types.Type.STRING,
+                description="The specific data to be written to the file",
+            )
+        },
+    ),
+)

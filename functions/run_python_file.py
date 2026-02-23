@@ -1,6 +1,7 @@
 # functions/run_python_file.py
 import os
 import subprocess
+from google.genai import types
 
 def run_python_file(working_directory, file_path, args=None):
     try:
@@ -30,3 +31,27 @@ def run_python_file(working_directory, file_path, args=None):
 
     except Exception as e:
         print(f"Error: Encountered: {e}")
+
+
+# google-genai FunctionDeclaration format
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Executes python file with optional arguments",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+            ),
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="Target file to run",
+            ),
+            "args": types.Schema(
+                type=types.Type.STRING,
+                description="Any additional arguments passed",
+            ),
+        },
+    ),
+)
